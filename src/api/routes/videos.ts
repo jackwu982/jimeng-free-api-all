@@ -138,7 +138,7 @@ export default {
           created: util.unixTimestamp(),
           data: [
             {
-              url: videoUrl,
+              historyId: videoUrl,
               revised_prompt: prompt,
             },
           ],

@@ -2212,54 +2212,50 @@ export async function getVideoUrlByHistoryId(
 
   logger.info(`Seedance:查询视频生成结果，历史ID: ${historyId}`);
 
-  try {
-    const result = await request(
-      "post",
-      "/mweb/v1/get_history_by_ids",
-      refreshToken,
-      {
-        data: { history_ids: [historyId] },
-      },
-    );
+  const result = await request(
+    "post",
+    "/mweb/v1/get_history_by_ids",
+    refreshToken,
+    {
+      data: { history_ids: [historyId] },
+    },
+  );
 
-    const responseStr = JSON.stringify(result);
-    logger.info(`Seedance: 轮询响应摘要: ${responseStr.substring(0, 300)}...`);
+  const responseStr = JSON.stringify(result);
+  logger.info(`Seedance: 轮询响应摘要: ${responseStr}`);
 
-    // get_history_by_ids 返回的数据可能以 historyId 为键（如 result["8918159809292"]），
-    // 也可能在 result.history_list 数组中
-    let historyData = result.history_list?.[0] || result[historyId];
+  // get_history_by_ids 返回的数据可能以 historyId 为键（如 result["8918159809292"]），
+  // 也可能在 result.history_list 数组中
+  let historyData = result.history_list?.[0] || result[historyId];
 
-    if (!historyData) {
-      throw new APIException(EX.API_REQUEST_FAILED, "查询失败");
-    }
-
-    status = historyData.status;
-    failCode = historyData.fail_code;
-    item_list = historyData.item_list || [];
-
-    logger.info(`Seedance: 状态=${status}, 失败码=${failCode || "无"}`);
-
-    if (status === 30) {
-      const error =
-        failCode === 2038
-          ? new APIException(EX.API_CONTENT_FILTERED, "内容被过滤")
-          : new APIException(
-              EX.API_IMAGE_GENERATION_FAILED,
-              `生成失败，错误码: ${failCode}`,
-            );
-      error.historyId = historyId;
-      throw error;
-    }
-
-    if (status === 20) {
-      return {
-        status: "padding",
-        message: "生成中",
-        historyId,
-      };
-    }
-  } catch {
+  if (!historyData) {
     throw new APIException(EX.API_REQUEST_FAILED, "查询失败");
+  }
+
+  status = historyData.status;
+  failCode = historyData.fail_code;
+  item_list = historyData.item_list || [];
+
+  logger.info(`Seedance: 状态=${status}, 失败码=${failCode || "无"}`);
+
+  if (status === 30) {
+    const error =
+      failCode === 2038
+        ? new APIException(EX.API_CONTENT_FILTERED, "内容被过滤")
+        : new APIException(
+            EX.API_IMAGE_GENERATION_FAILED,
+            `生成失败，错误码: ${failCode}`,
+          );
+    error.historyId = historyId;
+    throw error;
+  }
+
+  if (status === 20) {
+    return {
+      status: "padding",
+      message: "生成中",
+      historyId,
+    };
   }
 
   // 尝试通过 get_local_item_list 获取高质量视频下载URL
