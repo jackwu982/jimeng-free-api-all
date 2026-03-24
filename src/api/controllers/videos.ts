@@ -116,6 +116,7 @@ const EXT_TO_MATERIAL_TYPE: Record<string, SeedanceMaterialType> = {
   ".m4v": "video",
   ".mp3": "audio",
   ".wav": "audio",
+  ".m4a": "audio",
 };
 
 // materialTypes 编码映射
