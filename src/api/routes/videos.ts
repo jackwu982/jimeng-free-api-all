@@ -153,7 +153,7 @@ export default {
 
       return await getVideoUrlByHistoryId(
         request.query.historyId,
-        request.headers.authorization,
+        request.headers.authorization.replace("Bearer ", ""),
       );
     },
   },
