@@ -2274,7 +2274,11 @@ export async function getVideoUrlByHistoryId(
       );
       if (hqVideoUrl) {
         logger.info(`Seedance: 视频生成成功（高质量），URL: ${hqVideoUrl}`);
-        return hqVideoUrl;
+        return {
+          status: "success",
+          videoUrl: hqVideoUrl,
+          historyId,
+        };
       }
     } catch (error) {
       logger.warn(
