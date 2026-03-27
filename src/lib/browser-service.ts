@@ -56,7 +56,6 @@ class BrowserService {
             "--disable-gpu",
             "--no-first-run",
             "--no-zygote",
-            "--single-process",
           ],
         });
 
